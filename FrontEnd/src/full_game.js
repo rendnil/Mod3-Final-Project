@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const rockImage = document.getElementById("y-img")
   const shipImage = document.getElementById("ship-img")
 
+  ctx.canvas.width = window.innerWidth
+  ctx.canvas.height = window.innerHeight
 
   //ship specs
   let shipX = canvas.width/2
