@@ -11,7 +11,7 @@ alert("Start Game")
 
   const coinImage = document.getElementById("coin-img")
   const rockImage = document.getElementById("y-img")
-
+  const shipImage = document.getElementById("ship-img")
 
 
   //ship specs
@@ -29,6 +29,7 @@ alert("Start Game")
   let bulletRadius = 3
   let bulletDy = 5
   let bulletDelay = 5
+  let bulletCounter = 0
 
   //rock specs
 
@@ -66,14 +67,21 @@ alert("Start Game")
   ctx.fillText("Score: "+hitCounter, 8, 20);
   }
 
+  function drawHitPercentage(){
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText("Hit Percentage: "+Math.floor((100*hitCounter/bulletCounter))+"%", 335, 20);
+  }
+
 
   function drawShip(){
     ctx.beginPath()
-    ctx.moveTo(shipX, shipY-yUpFromCenter)
-    ctx.lineTo(shipX - xFromCenter, shipY+yDownFromCenter)
-    ctx.lineTo(shipX + xFromCenter, shipY + yDownFromCenter)
-    ctx.fillStyle = "rgba(255, 255, 255, 1)"
-    ctx.fill()
+    ctx.drawImage(shipImage, shipX-xFromCenter, shipY-yUpFromCenter, xFromCenter*2, yDownFromCenter + yDownFromCenter)
+    //ctx.moveTo(shipX, shipY-yUpFromCenter)
+    //ctx.lineTo(shipX - xFromCenter, shipY+yDownFromCenter)
+    //ctx.lineTo(shipX + xFromCenter, shipY + yDownFromCenter)
+    //ctx.fillStyle = "rgba(255, 255, 255, 1)"
+    //ctx.fill()
     ctx.closePath()
 
   }
@@ -87,6 +95,7 @@ alert("Start Game")
     ctx.fill()
     ctx.closePath()
     bulletArray.push(newBullet)
+    bulletCounter++
 
   }
 
@@ -212,6 +221,7 @@ alert("Start Game")
     //ctx.drawImage(image, 0,0, canvas.width, canvas.height)
     drawShip()
     drawScore()
+    drawHitPercentage()
 
 
     //renderCoin()
