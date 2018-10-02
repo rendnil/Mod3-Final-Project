@@ -1,7 +1,14 @@
 document.addEventListener("DOMContentLoaded", ()=>{
 
 
-alert("Start Game")
+  const startButton = document.getElementById("start-game")
+  startButton.addEventListener("click", start_game)
+
+  function start_game(){
+    canvas.style = "display:block"
+    startButton.style = "display:none"
+  }
+
 
 
   const canvas = document.getElementById('canvas')
