@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", ()=>{
+document.addEventListener("DOMContentLoaded", () => {
 
 
   const startButton = document.getElementById("start-game")
   startButton.addEventListener("click", start_game)
 
-  function start_game(){
+  function start_game() {
     canvas.style = "display:block"
     startButton.style = "display:none"
   }
@@ -19,12 +19,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const coinImage = document.getElementById("coin-img")
   const rockImage = document.getElementById("y-img")
   const shipImage = document.getElementById("ship-img")
+  let laser = new Sound("./public/laser1.wav")
 
   ctx.canvas.width = window.innerWidth
   ctx.canvas.height = window.innerHeight
 
   //ship specs
-  let shipX = canvas.width/2
+  let shipX = canvas.width / 2
   let shipY = canvas.height * (0.9)
   let xFromCenter = 12.5
   let yUpFromCenter = 25
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   let shipDy = 5
 
   //bullet specs
-  let bulletArray = [ ]
+  let bulletArray = []
   let bulletRadius = 3
   let bulletDy = 5
   let bulletDelay = 5
@@ -60,32 +61,32 @@ document.addEventListener("DOMContentLoaded", ()=>{
   let spacePressed = false
 
   //sprite rendering
-  function renderCoin(){
+  function renderCoin() {
     let portion = timer % 10
-    ctx.drawImage(coinImage, portion * (coinImage.width/10),0, 46, coinImage.height, canvas.width/2, canvas.height/2, coinImage.width/10, coinImage.height)
+    ctx.drawImage(coinImage, portion * (coinImage.width / 10), 0, 46, coinImage.height, canvas.width / 2, canvas.height / 2, coinImage.width / 10, coinImage.height)
   }
 
 
-  function rand(){
+  function rand() {
     return Math.random()
   }
 
   function drawScore() {
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "white";
-  ctx.fillText("Score: "+hitCounter, 8, 20);
-  }
-
-  function drawHitPercentage(){
     ctx.font = "16px Arial";
     ctx.fillStyle = "white";
-    ctx.fillText("Hit Percentage: "+Math.floor((100*hitCounter/bulletCounter))+"%", 335, 20);
+    ctx.fillText("Score: " + hitCounter, 8, 20);
+  }
+
+  function drawHitPercentage() {
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText("Hit Percentage: " + Math.floor((100 * hitCounter / bulletCounter)) + "%", 335, 20);
   }
 
 
-  function drawShip(){
+  function drawShip() {
     ctx.beginPath()
-    ctx.drawImage(shipImage, shipX-xFromCenter, shipY-yUpFromCenter, xFromCenter*2, yDownFromCenter + yDownFromCenter)
+    ctx.drawImage(shipImage, shipX - xFromCenter, shipY - yUpFromCenter, xFromCenter * 2, yDownFromCenter + yDownFromCenter)
     //ctx.moveTo(shipX, shipY-yUpFromCenter)
     //ctx.lineTo(shipX - xFromCenter, shipY+yDownFromCenter)
     //ctx.lineTo(shipX + xFromCenter, shipY + yDownFromCenter)
@@ -95,47 +96,59 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   }
 
-  function drawInitialBullet(){
+  function drawInitialBullet() {
 
-    let newBullet = {x: shipX, y: (shipY-yUpFromCenter), visible: true}
+    let newBullet = {
+      x: shipX,
+      y: (shipY - yUpFromCenter),
+      visible: true
+    }
     ctx.beginPath()
-    ctx.arc(shipX, shipY - yUpFromCenter, bulletRadius, 0, Math.PI*2)
+    ctx.arc(shipX, shipY - yUpFromCenter, bulletRadius, 0, Math.PI * 2)
     ctx.fillStyle = "red"
     ctx.fill()
+    laser.play()
     ctx.closePath()
     bulletArray.push(newBullet)
     bulletCounter++
 
   }
 
-  function drawBullets(){
-    bulletArray.forEach((b, index)=>{
+  function drawBullets() {
+    bulletArray.forEach((b, index) => {
 
-      if (b.visible){
-      ctx.beginPath()
-      ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI*2)
-      ctx.fillStyle = "red"
-      ctx.fill()
-      ctx.closePath()
+      if (b.visible) {
+        ctx.beginPath()
+        ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI * 2)
+        ctx.fillStyle = "red"
+        ctx.fill()
+        ctx.closePath()
 
 
-      //animate
-      b.y -= bulletDy
-    }
+        //animate
+        b.y -= bulletDy
+      }
       //delete bullet from array if it goes off the screen
-      if (b.y < 0 || b.visible === false){
-        bulletArray.splice(index,1)
+      if (b.y < 0 || b.visible === false) {
+        bulletArray.splice(index, 1)
       }
 
     })
   }
 
-  function drawInitialRock(){
-      //need to refactor this
-    let newRock = {x: rand()*(canvas.width), y: (rand()*canvas.height)*0.25, dx:(rand()*3), dy:(rand()*3), radius:(rand()*rockRadius)+15,  visible: true}
+  function drawInitialRock() {
+    //need to refactor this
+    let newRock = {
+      x: rand() * (canvas.width),
+      y: (rand() * canvas.height) * 0.25,
+      dx: (rand() * 3),
+      dy: (rand() * 3),
+      radius: (rand() * rockRadius) + 15,
+      visible: true
+    }
 
     ctx.beginPath()
-    ctx.arc(newRock.x, newRock.y, newRock.radius, 0, Math.PI*2)
+    ctx.arc(newRock.x, newRock.y, newRock.radius, 0, Math.PI * 2)
     ctx.fillStyle = "green"
     ctx.fill()
     ctx.closePath()
@@ -143,35 +156,35 @@ document.addEventListener("DOMContentLoaded", ()=>{
     rockArray.push(newRock)
   }
 
-  function drawRocks(){
-    rockArray.forEach((r, index)=>{
-      if (r.visible){
-      ctx.beginPath()
-      if (hitCounter > 1){
-      ctx.drawImage(rockImage, r.x-r.radius, r.y-r.radius, r.radius*2, r.radius*2)
-    }else{
+  function drawRocks() {
+    rockArray.forEach((r, index) => {
+      if (r.visible) {
+        ctx.beginPath()
+        if (hitCounter > 1) {
+          ctx.drawImage(rockImage, r.x - r.radius, r.y - r.radius, r.radius * 2, r.radius * 2)
+        } else {
 
-      ctx.arc(r.x, r.y, r.radius, 0, Math.PI*2)
-      ctx.fillStyle = "green"
-      ctx.fill()
-    }
-      ctx.closePath()
+          ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2)
+          ctx.fillStyle = "green"
+          ctx.fill()
+        }
+        ctx.closePath()
 
 
-      //check for screen collision
-      //x axis collision
-      if ((r.x <r.radius) || ((r.x + r.radius) > canvas.width)){
-        r.dx = -r.dx
+        //check for screen collision
+        //x axis collision
+        if ((r.x < r.radius) || ((r.x + r.radius) > canvas.width)) {
+          r.dx = -r.dx
+        }
+
+
+        //animate
+        r.y += r.dy
+        r.x += r.dx
       }
-
-
-      //animate
-      r.y += r.dy
-      r.x += r.dx
-    }
       //delete rock from array if it goes off the screen
-      if ((r.y > canvas.height)||r.visible == false){
-        rockArray.splice(index,1)
+      if ((r.y > canvas.height) || r.visible == false) {
+        rockArray.splice(index, 1)
       }
 
     })
@@ -179,10 +192,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
 
-  function checkBulletCollision(){
-    bulletArray.forEach((bullet)=>{
-      rockArray.forEach((rock)=>{
-        if((bullet.x>(rock.x- rock.radius))&&(bullet.x< (rock.x + rock.radius))&&(bullet.y>(rock.y-rock.radius))&&(bullet.y<(rock.y+rock.radius))){
+  function checkBulletCollision() {
+    bulletArray.forEach((bullet) => {
+      rockArray.forEach((rock) => {
+        if ((bullet.x > (rock.x - rock.radius)) && (bullet.x < (rock.x + rock.radius)) && (bullet.y > (rock.y - rock.radius)) && (bullet.y < (rock.y + rock.radius))) {
           rock.visible = false
           bullet.visible = false
           hitCounter++
@@ -192,40 +205,38 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
 
-  function generateStar(canvas, ctx, starRadius){
-			ctx.beginPath();
-			ctx.arc(starRadius + (Math.random() * canvas.width), starRadius + (Math.random() * canvas.height), starRadius*Math.random(), 0, Math.PI*2, false);
-      //ctx.arc(100, 30, starRadius, 0, Math.PI*2, false);
+  function generateStar(canvas, ctx, starRadius) {
+    ctx.beginPath();
+    ctx.arc(starRadius + (Math.random() * canvas.width), starRadius + (Math.random() * canvas.height), starRadius * Math.random(), 0, Math.PI * 2, false);
+    //ctx.arc(100, 30, starRadius, 0, Math.PI*2, false);
 
-      let rand = Math.random();
-      if(rand <= 0.5){
-				  ctx.fillStyle = "rgba(255, 255, 255, 1)";
-				  ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
-				  ctx.shadowBlur = 3;
-			}
-			else if(rand > 0.75){
-				  ctx.fillStyle = "rgba(255, 254, 196, 1)";
-				  ctx.shadowColor = "rgba(255, 254, 196, 0.5)";
-				  ctx.shadowBlur = 4;
-			}
-			else{
-				  ctx.fillStyle = "rgba(192, 247, 255, 1)";
-				  ctx.shadowColor = "rgba(192, 247, 255, 0.5)";
-				  ctx.shadowBlur = 7;
-			}
-			ctx.fill();
-	}
+    let rand = Math.random();
+    if (rand <= 0.5) {
+      ctx.fillStyle = "rgba(255, 255, 255, 1)";
+      ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+      ctx.shadowBlur = 3;
+    } else if (rand > 0.75) {
+      ctx.fillStyle = "rgba(255, 254, 196, 1)";
+      ctx.shadowColor = "rgba(255, 254, 196, 0.5)";
+      ctx.shadowBlur = 4;
+    } else {
+      ctx.fillStyle = "rgba(192, 247, 255, 1)";
+      ctx.shadowColor = "rgba(192, 247, 255, 0.5)";
+      ctx.shadowBlur = 7;
+    }
+    ctx.fill();
+  }
 
-  function drawBackground(){
+  function drawBackground() {
 
-    if (timer < 90){
+    if (timer < 90) {
       generateStar(canvas2, ctx2, 5)
       requestAnimationFrame(drawBackground)
 
     }
   }
 
-  function draw(){
+  function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     //ctx.drawImage(image, 0,0, canvas.width, canvas.height)
     drawShip()
@@ -241,27 +252,27 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 
     //right movement
-    if (rightPressed && ((shipX+xFromCenter) < canvas.width)){
-      shipX +=shipDx
+    if (rightPressed && ((shipX + xFromCenter) < canvas.width)) {
+      shipX += shipDx
     }
 
     //left movement
-    if (leftPressed && (shipX>xFromCenter)){
-      shipX -=shipDx
+    if (leftPressed && (shipX > xFromCenter)) {
+      shipX -= shipDx
     }
 
     //up movement
-    if (upPressed && (shipY>yUpFromCenter)){
+    if (upPressed && (shipY > yUpFromCenter)) {
       shipY -= shipDy
     }
 
     //down movement
-    if (downPressed && ((shipY+yDownFromCenter)<canvas.height)){
+    if (downPressed && ((shipY + yDownFromCenter) < canvas.height)) {
       shipY += shipDy
     }
 
     //shoot
-    if (spacePressed && timer %bulletDelay===0){
+    if (spacePressed && timer % bulletDelay === 0) {
       drawInitialBullet()
     }
 
@@ -280,32 +291,32 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 
     // now we deploy a rock
-    if (timer %rockDelay===0){
+    if (timer % rockDelay === 0) {
       drawInitialRock()
     }
     drawRocks()
 
 
     requestAnimationFrame(draw)
-  }//end draw
+  } //end draw
 
 
 
   function keyDownHandler(e) {
-  //right
-    if(e.keyCode == 68) {
-    rightPressed = true;
-    //left
-  }else if(e.keyCode == 65) {
-    leftPressed = true;
-    //up
-  }else if (e.keyCode == 87){
+    //right
+    if (e.keyCode == 68) {
+      rightPressed = true;
+      //left
+    } else if (e.keyCode == 65) {
+      leftPressed = true;
+      //up
+    } else if (e.keyCode == 87) {
       upPressed = true;
-    //down
-  }else if (e.keyCode == 83){
+      //down
+    } else if (e.keyCode == 83) {
       downPressed = true;
-    //space bar
-  }else if (e.keyCode == 74){
+      //space bar
+    } else if (e.keyCode == 74) {
       spacePressed = true
 
     }
@@ -313,20 +324,20 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   function keyUpHandler(e) {
     //right
-    if(e.keyCode == 68) {
+    if (e.keyCode == 68) {
       rightPressed = false;
       //left
-    }else if(e.keyCode == 65) {
+    } else if (e.keyCode == 65) {
       leftPressed = false;
       //up
-    }else if (e.keyCode == 87){
-        upPressed = false;
+    } else if (e.keyCode == 87) {
+      upPressed = false;
       //down
-    }else if (e.keyCode == 83){
-        downPressed = false;
+    } else if (e.keyCode == 83) {
+      downPressed = false;
 
-    //j pressed for shoot
-  }else if (e.keyCode == 74){
+      //j pressed for shoot
+    } else if (e.keyCode == 74) {
       spacePressed = false
 
     }
@@ -343,4 +354,4 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 
 
-  })
+})
