@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const coinImage = document.getElementById("coin-img")
   const rockImage = document.getElementById("y-img")
   const shipImage = document.getElementById("ship-img")
+  const burnerImage = document.getElementById("burner-img")
 
   //ctx.canvas.width = window.innerWidth
   //ctx.canvas.height = window.innerHeight
@@ -88,11 +89,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
     ctx.beginPath()
     //ctx.drawImage(shipImage, shipX-xFromCenter, shipY-yUpFromCenter, 50, 75)
     ctx.drawImage(shipImage, shipX-xFromCenter, shipY-yUpFromCenter, xFromCenter*2, yDownFromCenter + yDownFromCenter)
-    //ctx.moveTo(shipX, shipY-yUpFromCenter)
-    //ctx.lineTo(shipX - xFromCenter, shipY+yDownFromCenter)
-    //ctx.lineTo(shipX + xFromCenter, shipY + yDownFromCenter)
-    //ctx.fillStyle = "rgba(255, 255, 255, 1)"
-    //ctx.fill()
+    // ctx.moveTo(shipX, shipY-yUpFromCenter)
+    // ctx.lineTo(shipX - xFromCenter, shipY+yDownFromCenter)
+    // ctx.lineTo(shipX + xFromCenter, shipY + yDownFromCenter)
+    // ctx.fillStyle = "rgba(255, 255, 255, 1)"
+    // ctx.fill()
     ctx.closePath()
 
   }
@@ -201,11 +202,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
     //up movement
     if (upPressed && (shipY>yUpFromCenter)){
       shipY -= shipDy
+      ctx.drawImage(burnerImage,shipX-(xFromCenter*0.75), shipY+yDownFromCenter, 20, 20)
     }
 
     //down movement
     if (downPressed && ((shipY+yDownFromCenter)<canvas.height)){
       shipY += shipDy
+
     }
 
     //shoot
