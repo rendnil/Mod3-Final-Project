@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", ()=>{
 
+  let gameInProgress = false
 
   const startButton = document.getElementById("start-game")
   startButton.addEventListener("click", start_game)
@@ -7,8 +8,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
   function start_game(){
     canvas.style = "display:block"
     startButton.style = "display:none"
+    gameInProgress = true
+    draw()
   }
-
 
 
   const canvas = document.getElementById('canvas')
@@ -19,30 +21,30 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const coinImage = document.getElementById("coin-img")
   const rockImage = document.getElementById("y-img")
   const shipImage = document.getElementById("ship-img")
+  const burnerImage = document.getElementById("burner-img")
 
-  ctx.canvas.width = window.innerWidth
-  ctx.canvas.height = window.innerHeight
+  //ctx.canvas.width = window.innerWidth
+  //ctx.canvas.height = window.innerHeight
+
+
 
   //ship specs
   let shipX = canvas.width/2
   let shipY = canvas.height * (0.9)
   let xFromCenter = 12.5
-  let yUpFromCenter = 25
-  let yDownFromCenter = 15
+  let yUpFromCenter = 33
+  let yDownFromCenter = 17
 
   let shipDx = 5
   let shipDy = 5
 
   //bullet specs
-  let bulletArray = [ ]
   let bulletRadius = 3
   let bulletDy = 5
   let bulletDelay = 5
-  let bulletCounter = 0
+
 
   //rock specs
-
-  let rockArray = []
   let rockRadius = 10
   let rockDy = 2
   let rockDelay = 120
@@ -85,97 +87,33 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   function drawShip(){
     ctx.beginPath()
+    //ctx.drawImage(shipImage, shipX-xFromCenter, shipY-yUpFromCenter, 50, 75)
     ctx.drawImage(shipImage, shipX-xFromCenter, shipY-yUpFromCenter, xFromCenter*2, yDownFromCenter + yDownFromCenter)
-    //ctx.moveTo(shipX, shipY-yUpFromCenter)
-    //ctx.lineTo(shipX - xFromCenter, shipY+yDownFromCenter)
-    //ctx.lineTo(shipX + xFromCenter, shipY + yDownFromCenter)
-    //ctx.fillStyle = "rgba(255, 255, 255, 1)"
-    //ctx.fill()
+    // ctx.moveTo(shipX, shipY-yUpFromCenter)
+    // ctx.lineTo(shipX - xFromCenter, shipY+yDownFromCenter)
+    // ctx.lineTo(shipX + xFromCenter, shipY + yDownFromCenter)
+    // ctx.fillStyle = "rgba(255, 255, 255, 1)"
+    // ctx.fill()
     ctx.closePath()
 
   }
 
   function drawInitialBullet(){
-
-    let newBullet = {x: shipX, y: (shipY-yUpFromCenter), visible: true}
-    ctx.beginPath()
-    ctx.arc(shipX, shipY - yUpFromCenter, bulletRadius, 0, Math.PI*2)
-    ctx.fillStyle = "red"
-    ctx.fill()
-    ctx.closePath()
-    bulletArray.push(newBullet)
-    bulletCounter++
-
+    let newBullet = new Bullet({x: shipX, y:(shipY-yUpFromCenter), radius: bulletRadius, dx: 0, dy: bulletDy, color: "red", visible: true})
+    newBullet.renderSingle(ctx)
   }
 
   function drawBullets(){
-    bulletArray.forEach((b, index)=>{
-
-      if (b.visible){
-      ctx.beginPath()
-      ctx.arc(b.x, b.y, bulletRadius, 0, Math.PI*2)
-      ctx.fillStyle = "red"
-      ctx.fill()
-      ctx.closePath()
-
-
-      //animate
-      b.y -= bulletDy
-    }
-      //delete bullet from array if it goes off the screen
-      if (b.y < 0 || b.visible === false){
-        bulletArray.splice(index,1)
-      }
-
-    })
+    Bullet.renderAll(ctx)
   }
 
   function drawInitialRock(){
-      //need to refactor this
-    let newRock = {x: rand()*(canvas.width), y: (rand()*canvas.height)*0.25, dx:(rand()*3), dy:(rand()*3), radius:(rand()*rockRadius)+15,  visible: true}
-
-    ctx.beginPath()
-    ctx.arc(newRock.x, newRock.y, newRock.radius, 0, Math.PI*2)
-    ctx.fillStyle = "green"
-    ctx.fill()
-    ctx.closePath()
-
-    rockArray.push(newRock)
+    let newRock = new Rock({x: rand()*(canvas.width), y: (rand()*canvas.height)*0.25, dx:(rand()*3), dy:(rand()*3), radius:(rand()*rockRadius)+15, color: "green", visible: true})
+    newRock.renderSingle(ctx)
   }
 
   function drawRocks(){
-    rockArray.forEach((r, index)=>{
-      if (r.visible){
-      ctx.beginPath()
-      if (hitCounter > 1){
-      ctx.drawImage(rockImage, r.x-r.radius, r.y-r.radius, r.radius*2, r.radius*2)
-    }else{
-
-      ctx.arc(r.x, r.y, r.radius, 0, Math.PI*2)
-      ctx.fillStyle = "green"
-      ctx.fill()
-    }
-      ctx.closePath()
-
-
-      //check for screen collision
-      //x axis collision
-      if ((r.x <r.radius) || ((r.x + r.radius) > canvas.width)){
-        r.dx = -r.dx
-      }
-
-
-      //animate
-      r.y += r.dy
-      r.x += r.dx
-    }
-      //delete rock from array if it goes off the screen
-      if ((r.y > canvas.height)||r.visible == false){
-        rockArray.splice(index,1)
-      }
-
-    })
-
+    Rock.renderAll(ctx)
   }
 
 
@@ -188,6 +126,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
           hitCounter++
         }
       })
+    })
+  }
+
+  //check for collision of ship with enemy
+  function checkShipCollision(){
+    rockArray.forEach((rock)=>{
+
+      if((rock.x>(shipX-xFromCenter)) && (rock.x<(shipX+xFromCenter)) && (rock.y> (shipY-yUpFromCenter)) && (rock.y< (shipY+yDownFromCenter)) ){
+        alert("you suck")
+        gameInProgress = false
+        canvas.style = "display:none"
+
+      }
     })
   }
 
@@ -227,17 +178,15 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   function draw(){
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    //ctx.drawImage(image, 0,0, canvas.width, canvas.height)
+
+
     drawShip()
     drawScore()
+    drawRocks()
     drawHitPercentage()
 
 
     //renderCoin()
-
-
-
-
 
 
     //right movement
@@ -253,11 +202,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
     //up movement
     if (upPressed && (shipY>yUpFromCenter)){
       shipY -= shipDy
+      ctx.drawImage(burnerImage,shipX-(xFromCenter*0.75), shipY+yDownFromCenter, 20, 20)
     }
 
     //down movement
     if (downPressed && ((shipY+yDownFromCenter)<canvas.height)){
       shipY += shipDy
+
     }
 
     //shoot
@@ -268,25 +219,26 @@ document.addEventListener("DOMContentLoaded", ()=>{
     //loop over the bullets and draw them
     drawBullets()
     checkBulletCollision()
+    checkShipCollision()
 
 
 
-    timer++
 
-    // if (timer % 2 ==0){
-    //
-
-    // }
 
 
     // now we deploy a rock
     if (timer %rockDelay===0){
       drawInitialRock()
     }
-    drawRocks()
 
 
+    if (gameInProgress){
     requestAnimationFrame(draw)
+
+    }
+
+    timer++
+
   }//end draw
 
 
@@ -337,8 +289,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
   document.addEventListener("keydown", keyDownHandler, false)
   document.addEventListener("keyup", keyUpHandler, false)
 
-  draw()
-  drawBackground()
+
+
 
 
 
