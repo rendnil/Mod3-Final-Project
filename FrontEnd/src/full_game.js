@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const rockImage = document.getElementById("y-img")
   const shipImage = document.getElementById("ship-img")
   const burnerImage = document.getElementById("burner-img")
+  let laser = new Sound("./public/laser3.wav")
 
   //ctx.canvas.width = window.innerWidth
   //ctx.canvas.height = window.innerHeight
